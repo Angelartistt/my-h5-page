@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>你是第五人格庄园里的谁</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body { min-height:100vh; background:linear-gradient(160deg,#46525e 0%,#2f3841 100%);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif; color:#2b2620; }
+  .wrap { max-width:480px; margin:0 auto; padding:24px 18px 40px; }
+  .card { background:#f4ecdc; border-radius:16px; padding:22px 18px; box-shadow:0 10px 30px rgba(0,0,0,.35); }
+  h1 { font-size:26px; color:#e8d9a8; text-align:center; letter-spacing:2px; line-height:1.35; }
+  .sub { text-align:center; color:#c9bf9f; font-size:13px; margin-top:10px; line-height:1.7; }
+  .progress { height:6px; background:#5a6672; border-radius:3px; overflow:hidden; margin:20px 0 16px; }
+  .progress > i { display:block; height:100%; background:#e8d9a8; border-radius:3px; transition:width .25s; }
+  .qno { font-size:12px; color:#8a7f66; letter-spacing:1px; margin-bottom:8px; }
+  .qtext { font-size:17px; font-weight:600; line-height:1.6; margin-bottom:18px; }
+  .opt { display:block; width:100%; text-align:left; background:#fffaf1; border:1px solid #d8c9a8;
+    border-radius:12px; padding:14px 14px; margin-bottom:12px; font-size:14.5px; line-height:1.55;
+    color:#2b2620; cursor:pointer; transition:all .15s; }
+  .opt:active { background:#eee2c6; transform:scale(.985); }
+  .opt .mark { display:inline-block; width:22px; height:22px; line-height:22px; text-align:center;
+    border-radius:6px; background:#3f4a54; color:#e8d9a8; font-size:12px; margin-right:8px; }
+  .btn { display:block; width:100%; border:none; border-radius:12px; padding:15px; font-size:16px; font-weight:600;
+    background:#3f4a54; color:#e8d9a8; cursor:pointer; margin-top:8px; }
+  .btn.ghost { background:#6b7681; color:#f4ecdc; }
+  .tag { display:inline-block; background:#3f4a54; color:#e8d9a8; border-radius:20px; padding:5px 12px;
+    font-size:12px; margin:0 6px 8px 0; }
+  .result-name { font-size:28px; font-weight:700; text-align:center; margin:10px 0 4px; }
+  .result-group { text-align:center; color:#8a7f66; font-size:13px; margin-bottom:16px; }
+  .result-line { font-family:"Kaiti SC",KaiTi,"STKaiti","Songti SC",serif; font-size:16px; line-height:1.85;
+    color:#4a3f2c; text-align:center; padding:12px 6px 14px; border-top:1px dashed #d8c9a8; border-bottom:1px dashed #d8c9a8; margin:14px 0 4px; letter-spacing:.5px; }
+  .result-desc { font-size:14.5px; line-height:1.8; background:#fffaf1; border-radius:12px; padding:14px; margin-top:12px; }
+  .sib { margin-top:14px; font-size:13px; color:#6b6149; line-height:1.8; }
+  .disc { margin-top:18px; font-size:11px; color:#9c927a; line-height:1.7; text-align:center; }
+  .center { text-align:center; }
+  .title-block { margin-top:30px; }
+  .sec-h { font-size:13px; font-weight:700; letter-spacing:2px; color:#8a7f66; margin:26px 0 12px; }
+  .sec-h::before { content:""; display:inline-block; width:14px; height:2px; background:#c2b28c;
+    vertical-align:middle; margin-right:8px; }
+  .mcard { background:#f4ecdc; border-radius:16px; padding:18px 16px; box-shadow:0 10px 30px rgba(0,0,0,.3); }
+  .mcard + .mcard { margin-top:12px; }
+  .kv { display:flex; justify-content:space-between; font-size:13px; padding:7px 0; border-bottom:1px dashed #e0d3b6; }
+  .kv:last-child { border-bottom:none; }
+  .kv b { font-weight:600; color:#2b2620; }
+  .kv span { color:#6b6149; }
+  .bars { margin-top:6px; }
+  .bar-row { margin-top:9px; }
+  .bar-top { display:flex; justify-content:space-between; font-size:12px; color:#6b6149; margin-bottom:4px; }
+  .bar-track { height:8px; background:#e6d9be; border-radius:4px; overflow:hidden; }
+  .bar-fill { height:100%; background:linear-gradient(90deg,#8d9a6f,#3f4a54); border-radius:4px; }
+  .bar-row.on .bar-top { color:#2b2620; font-weight:700; }
+  .match { display:flex; align-items:center; gap:12px; }
+  .dots { display:flex; gap:6px; }
+  .dot { width:12px; height:12px; border-radius:50%; background:#e0d3b6; }
+  .dot.on { background:#3f4a54; }
+  .match-num { font-size:26px; font-weight:700; color:#3f4a54; }
+  .match-num em { font-size:12px; font-style:normal; color:#8a7f66; font-weight:400; }
+  table { width:100%; border-collapse:collapse; font-size:12.5px; }
+  th { background:#e9dcc0; color:#4a3f2c; font-weight:600; padding:7px 8px; text-align:left; }
+  td { padding:8px; border-bottom:1px solid #e6d9be; line-height:1.6; vertical-align:top; color:#3d3529; }
+  tr:last-child td { border-bottom:none; }
+  td.rk { color:#8a7f66; width:40px; white-space:nowrap; }
+  td.pt { text-align:right; color:#3f4a54; white-space:nowrap; }
+  .ana-h { font-size:15px; font-weight:700; color:#3f4a54; margin-bottom:8px; }
+  .ana-tag { font-size:12px; color:#8d9a6f; letter-spacing:1px; margin-bottom:10px; }
+  .ana-p { font-size:14px; line-height:1.9; color:#3d3529; }
+  .ana-li { font-size:13.5px; line-height:1.85; color:#3d3529; padding-left:16px; position:relative; margin-top:6px; }
+  .ana-li::before { content:"·"; position:absolute; left:4px; color:#8d9a6f; font-weight:700; }
+  .ana-tip { font-size:13px; line-height:1.85; color:#6b6149; background:#fffaf1; border-left:3px solid #c2b28c;
+    border-radius:0 8px 8px 0; padding:11px 12px; margin-top:12px; }
+  .small { font-size:11.5px; color:#9c927a; line-height:1.7; margin-top:8px; }
+  svg { display:block; margin:0 auto; max-width:100%; }
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+const DATA = {"groups": {"guard": "守护·义气", "calc": "谋算·掌控", "genius": "天才·偏执", "show": "表演·伪装", "lone": "独行·自守", "wild": "野性·本能", "fate": "执念·未竟"}, "general": [{"q": "排位连跪三把，这个夜晚你打算怎么过？", "options": [{"t": "记下每局失误，改走位改路线，非把分打回来", "w": {"genius": 2, "calc": 1}}, {"t": "先退出来，去语音里听朋友吐槽，把队友和自己的情绪都顺一遍", "w": {"guard": 2, "lone": 1}}, {"t": "换号、换角色，去娱乐模式玩点花活", "w": {"show": 2, "wild": 1}}, {"t": "直接关掉游戏，一个人去逛地图、翻剧情", "w": {"lone": 2, "fate": 1}}]}, {"q": "开局队友秒倒、密码机被炸，你的第一反应？", "options": [{"t": "先判断救人路线和转点顺序，把账算清楚再动", "w": {"calc": 2, "genius": 1}}, {"t": "直接去扛刀，先把人换下来，自己倒了也无所谓", "w": {"guard": 2, "wild": 1}}, {"t": "安静修机，等别人去处理这摊事", "w": {"lone": 2, "calc": 1}}, {"t": "主动去拉监管者仇恨，把注意力全引到自己身上", "w": {"wild": 2, "show": 1}}]}, {"q": "你的游戏主页、社交账号是什么画风？", "options": [{"t": "极少更新，偶尔一句很疲惫的话，配一张空荡的庄园截图", "w": {"lone": 2, "fate": 1}}, {"t": "全是和固定队友的合照、治愈系搭配、慢节奏对局记录", "w": {"guard": 2, "show": 1}}, {"t": "满页翻车名场面、梗图、自嘲式发言", "w": {"show": 2, "wild": 1}}, {"t": "全是角色考据、剧情时间线、设定对比", "w": {"fate": 2, "genius": 1}}]}, {"q": "抽到一笔回声，你最先花在哪？", "options": [{"t": "存着，等限定金皮和活动保底", "w": {"calc": 2, "fate": 1}}, {"t": "给固定双排搭一套同款，一起拍合照", "w": {"guard": 2, "show": 1}}, {"t": "买最怪、最不符合大众审美的那套，只为取悦自己", "w": {"lone": 2, "wild": 1}}, {"t": "一套必须凑齐，缺一件心里就过不去", "w": {"genius": 2, "calc": 1}}]}, {"q": "如果真被关进庄园，你觉得自己能撑几天？", "options": [{"t": "第一天就把地形、机关、地窖位置摸清，当成一张新地图研究", "w": {"calc": 2, "genius": 1}}, {"t": "找个安全角落待着，先把身边的人保住", "w": {"guard": 2, "lone": 1}}, {"t": "兴奋大于害怕，往最不该去的地方走", "w": {"wild": 2, "show": 1}}, {"t": "翻遍庄园，只想弄清那封邀请函是谁写的", "w": {"fate": 2, "genius": 1}}]}, {"q": "新赛季第一天，你打开游戏先做什么？", "options": [{"t": "看版本改动和胜率，列好这赛季要练的角色池", "w": {"calc": 2, "genius": 1}}, {"t": "拉上固定队友，先把双排的默契和信号习惯找回来", "w": {"guard": 2, "lone": 1}}, {"t": "挑一个没人愿意玩的新角色，试试能不能玩出花来", "w": {"show": 2, "wild": 1}}, {"t": "先把本命角色的新皮和背景故事追完", "w": {"fate": 2, "genius": 1}}]}, {"q": "队里有人一路甩锅，你会怎么处理？", "options": [{"t": "开麦把责任和对局节点讲清楚，复盘完各自认账", "w": {"calc": 2, "guard": 1}}, {"t": "私下安慰被骂的那个人，先把气氛稳住", "w": {"guard": 2, "lone": 1}}, {"t": "一句话不说，赛后默默拉黑，心里记着这一笔", "w": {"lone": 2, "fate": 1}}, {"t": "顺着他的话阴阳回去，把气氛整活", "w": {"show": 2, "wild": 1}}]}, {"q": "如果只能留一个角色，你会留哪种？", "options": [{"t": "能救人、能挡刀、关键时刻敢第一个冲进去的那种", "w": {"guard": 2, "wild": 1}}, {"t": "能修能算、把整局节奏捏在手里的那种", "w": {"calc": 2, "genius": 1}}, {"t": "会骗、会整活、能让监管者摸不着头脑的那种", "w": {"show": 2, "wild": 1}}, {"t": "故事挖得深、越考据越有意思的那种", "w": {"fate": 2, "genius": 1}}]}, {"q": "赛后结算页面，你最先看哪一行？", "options": [{"t": "自己的牵制时长和救人次数，确认这局有没有真的做事", "w": {"guard": 2, "genius": 1}}, {"t": "队友的评价和点赞，确认大家玩得开不开心", "w": {"show": 2, "guard": 1}}, {"t": "有没有人截图发群里，确认这局够不够好笑", "w": {"show": 2, "wild": 1}}, {"t": "复盘自己哪一步算错、哪一步能更好", "w": {"genius": 2, "calc": 1}}]}, {"q": "赛季结算要做一期玩家高光集锦，你会投稿哪一段？", "options": [{"t": "我跑回去把人救下来、最后自己没走出去的那一段", "w": {"guard": 2, "fate": 1}}, {"t": "全程没失误、节奏一直握在我手里、一分多钟就收完的那一段", "w": {"genius": 2, "calc": 1}}, {"t": "一个人打的单排局，没人配合，但我自己玩得很爽", "w": {"lone": 2, "wild": 1}}, {"t": "全队翻车翻到笑场、语音里一片乱叫的那一段", "w": {"show": 2, "wild": 1}}]}, {"q": "一局里最让你难受的是什么？", "options": [{"t": "队友明明能救，却没有来", "w": {"guard": 2, "fate": 1}}, {"t": "自己算错了，被对面翻盘", "w": {"genius": 2, "calc": 1}}, {"t": "打得很难看，没人愿意看", "w": {"show": 2, "lone": 1}}, {"t": "被规则和队友绑住，不能按自己的方式打", "w": {"wild": 2, "lone": 1}}]}, {"q": "你更相信什么？", "options": [{"t": "相信人，哪怕被辜负", "w": {"guard": 2, "fate": 1}}, {"t": "相信计算，只要算得够准", "w": {"calc": 2, "genius": 1}}, {"t": "相信直觉，身体比脑子先知道", "w": {"wild": 2, "show": 1}}, {"t": "相信那件自己放不下的事", "w": {"fate": 2, "genius": 1}}]}], "branch": {"guard": [{"q": "有人在你面前被追，你的第一个动作是？", "options": ["先看他伤得重不重、缺什么，再决定怎么伸手", "不用想，先冲上去把那一下挡下来", "先喊一声“我来了”，把场面组织起来", "守住自己该守的位置，把手上那件事做到底"]}, {"q": "你护着一个人，护的到底是什么？", "options": ["他还活着", "他还有体面", "他知道有人站在他这一边", "事情按该有的规矩办完"]}, {"q": "队伍散了，你最后留下来做什么？", "options": ["收拾残局，把能带走的都带走", "顶在门口换时间，让里面的人先走", "一个一个把人带出去", "站在原地不动，谁回来就接谁"]}], "calc": [{"q": "你靠什么赢下这一局？", "options": ["信息：谁在哪、还剩几台、他手里有什么", "流程：先做什么、后做什么，一步不乱", "人：谁能用、谁会坏事，怎么摆", "局：提前把路线和位置都布置好"]}, {"q": "计划被打乱的那一刻，你会？", "options": ["立刻补第二套方案，边跑边改", "先退一步，看清楚了再决定", "硬掰回来，按原计划推到底", "这块不要了，另开一局"]}, {"q": "你更希望别人怎么形容你？", "options": ["算得准", "看得远", "压得住", "藏得深"]}], "genius": [{"q": "你对“作品”的态度是？", "options": ["只做到自己满意，别人懂不懂无所谓", "反复修，直到挑不出错", "要有自己的体系，别人得跟着走", "要让人看见，被人承认"]}, {"q": "有人当面否定你，你会？", "options": ["不屑，继续做自己的", "记下来，下次用结果证明", "当场反击，把话说回去", "不辩解，但一个字都不改"]}, {"q": "你最怕的是什么？", "options": ["作品不够纯粹", "自己还不够好", "没人承认", "被人看穿"]}], "show": [{"q": "你上台的理由是什么？", "options": ["想被看见", "除了台上，不知道还能在哪", "想让看的人开心", "想把别人看到的东西握在手里"]}, {"q": "面具掉了，你会？", "options": ["马上换一张", "干脆不演了，就这么站着", "笑着混过去", "把看到的人一起拉进戏里"]}, {"q": "你最擅长的是什么？", "options": ["编故事", "演情绪", "藏东西", "让人相信你"]}], "lone": [{"q": "一个人待着的时候，你在做什么？", "options": ["做手上那件活，做到手停不下来", "想过去的事，一遍一遍", "观察别人，但不靠近", "什么都不做，等"]}, {"q": "有人靠近你，你会？", "options": ["先退半步", "装没看见", "让他进来一点", "直接走开"]}, {"q": "你最需要的是什么？", "options": ["一个能说话的人", "一个不被打扰的地方", "一件能抓住的事", "一个不会离开的人"]}], "wild": [{"q": "危险来的那一瞬间，你的身体先做什么？", "options": ["跑", "扑上去", "伏低不动", "绕到侧面"]}, {"q": "你信什么多过道理？", "options": ["气味和声音", "饥饿和疼痛", "领地和边界", "直觉的那一秒"]}, {"q": "被逼到墙角，你会？", "options": ["拼命，能拖一个是一个", "装死，等它过去", "谈，看看能不能换", "找条缝钻出去"]}], "fate": [{"q": "你放不下的是什么？", "options": ["一个人", "一件作品、一件事", "一个没有答案的问题", "一个本来属于你的身份"]}, {"q": "代价摆到面前，你会？", "options": ["认，然后继续", "换，用别的东西顶", "拖，能拖一天是一天", "拉着别人一起付"]}, {"q": "你相信什么？", "options": ["有东西在指引", "一切都有代价", "我会等到那一天", "我可以重来"]}]}, "chars": {"幸运儿": {"group": "lone", "coords": ["D", "D", "C"], "real": "推演替身", "pos": "牵制", "tags": ["乐观", "随和", "适应力强", "平凡", "知足"], "desc": "以“幸运”为设定、没有固定过往的替身型求生者", "line": "你不是最幸运的那个，你只是从不把运气当回事。"}, "医生": {"group": "guard", "coords": ["A", "B", "A"], "real": "艾米丽·黛儿／医生", "pos": "牵制·辅助", "tags": ["温柔", "仁心", "坚韧", "理性", "隐忍"], "desc": "以医术救人，也藏着一段不能见光的过去", "line": "你救人时，从不先看对方值不值得。"}, "律师": {"group": "calc", "coords": ["A", "C", "A"], "real": "弗雷迪·莱利／律师", "pos": "破译", "tags": ["精明", "算计", "执念", "自卑", "功利"], "desc": "出身寒微、靠算计一路向上爬的诉讼律师", "line": "你算得清每一笔账，只算不清自己。"}, "慈善家": {"group": "show", "coords": ["D", "D", "D"], "real": "克利切·比尔森／“慈善家”", "pos": "牵制", "tags": ["伪善", "机敏", "自私", "表演型", "狡黠"], "desc": "以慈善之名行控制之实的伪善者", "line": "你给出去的好，每一分都记在自己账上。"}, "园丁": {"group": "lone", "coords": ["C", "A", "B"], "real": "艾玛·伍兹／园丁", "pos": "牵制·辅助", "tags": ["天真", "乐观", "执着", "淳朴", "破坏欲"], "desc": "在废墟里等父亲回家的女孩", "line": "你在废墟里等的那个人，其实一直没回来。"}, "魔术师": {"group": "show", "coords": ["A", "A", "C"], "real": "瑟维·勒·罗伊／魔术师", "pos": "牵制", "tags": ["自信", "虚荣", "机变", "表演型", "薄情"], "desc": "把舞台当作全部人生的魔术表演者", "line": "你谢幕时最怕的，是台下真的没人。"}, "冒险家": {"group": "lone", "coords": ["B", "C", "B"], "real": "库特·弗兰克／冒险家", "pos": "破译", "tags": ["幻想家", "逃避", "自诩英雄", "好奇", "怯懦"], "desc": "用幻想把自己写进英雄故事的人", "line": "你把日子过成了故事，故事里的你从没输过。"}, "佣兵": {"group": "guard", "coords": ["B", "C", "C"], "real": "奈布·萨贝达／雇佣兵", "pos": "救援", "tags": ["忠诚", "坚毅", "寡言", "护短", "创伤"], "desc": "从战场活下来、只为守住同伴的雇佣兵", "line": "你话少，但答应过的每一件都做到了。"}, "祭司": {"group": "fate", "coords": ["A", "A", "A"], "real": "菲欧娜·吉尔曼／祭司", "pos": "辅助·牵制", "tags": ["虔诚", "神秘", "冷静", "疏离", "求知"], "desc": "追随“门之钥”信仰的神秘学研究者", "line": "你推开的那扇门，后面未必有人。"}, "空军": {"group": "guard", "coords": ["B", "B", "C"], "real": "玛尔塔·贝坦菲尔／空军", "pos": "救援", "tags": ["果敢", "正直", "骄傲", "冲动", "责任感"], "desc": "把飞行梦当信念、把责任当盔甲的军人", "line": "你把责任当盔甲，穿久了会忘了自己怕什么。"}, "机械师": {"group": "calc", "coords": ["B", "A", "A"], "real": "特蕾西·列兹尼克／机械师", "pos": "破译", "tags": ["天才", "专注", "孤僻", "好胜", "机械依赖"], "desc": "把全部情感寄托在机械上的发明天才", "line": "你信的机器不会走，人却会。"}, "前锋": {"group": "guard", "coords": ["B", "C", "B"], "real": "威廉·艾利斯／前锋", "pos": "辅助·救援", "tags": ["热血", "莽撞", "义气", "好胜", "单纯"], "desc": "把球场上的热血原样带进庄园的运动健将", "line": "你冲得那么快，是怕有人等太久。"}, "盲女": {"group": "lone", "coords": ["A", "A", "B"], "real": "海伦娜·亚当斯／盲女", "pos": "破译", "tags": ["敏锐", "坚韧", "聪慧", "内敛", "渴望理解"], "desc": "看不见世界，却听得清人心的人", "line": "你看不见，却比谁都清楚谁在说谎。"}, "调香师": {"group": "genius", "coords": ["B", "B", "D"], "real": "薇拉·奈尔／调香师", "pos": "牵制", "tags": ["优雅", "执着", "偏执", "完美主义", "隐痛"], "desc": "为追寻姐姐而调制“忘忧之香”的名门之女", "line": "你一直在调一味能让自己忘掉的香。"}, "牛仔": {"group": "guard", "coords": ["D", "C", "C"], "real": "凯文·阿尤索／牛仔", "pos": "辅助·牵制", "tags": ["豪爽", "侠义", "保护欲", "漂泊", "自责"], "desc": "路见不平就出手的流浪牛仔", "line": "你救下的人很多，救不下的那个总在梦里。"}, "舞女": {"group": "wild", "coords": ["A", "B", "C"], "real": "玛格丽莎·泽莱／舞女", "pos": "牵制·辅助", "tags": ["妩媚", "隐忍", "求生欲强", "慕强", "脆弱"], "desc": "在马戏团与豪门之间周旋求生的舞者", "line": "你笑得越好看，越是不想让人看见别的。"}, "先知": {"group": "fate", "coords": ["C", "A", "B"], "real": "伊莱·克拉克／先知", "pos": "辅助", "tags": ["温和", "悲悯", "沉静感", "洞察", "担当"], "desc": "能感知征兆、却难以扭转走向的引导者", "line": "你早知道结局，还是把这一步走完了。"}, "入殓师": {"group": "lone", "coords": ["A", "A", "C"], "real": "伊索·卡尔／入殓师", "pos": "辅助", "tags": ["孤僻", "洁癖", "仪式感", "温柔", "淡漠"], "desc": "把死亡当作一门庄重手艺的殡葬师", "line": "你替所有人收拾体面，唯独不管自己。"}, "勘探员": {"group": "calc", "coords": ["A", "B", "A"], "real": "诺顿·坎贝尔／勘探员", "pos": "牵制·辅助", "tags": ["务实", "敏感", "记仇", "自卑", "精明"], "desc": "从矿难里爬出来、记着每一笔账的勘探员", "line": "你记得每一笔亏欠，也记得是谁先欠的。"}, "咒术师": {"group": "wild", "coords": ["C", "D", "C"], "real": "帕缇夏·多里瓦尔／咒术师", "pos": "牵制·辅助", "tags": ["骄傲", "神秘", "叛逆", "复仇心", "信仰"], "desc": "背负诅咒与血债的咒术研究者", "line": "你背的不是诅咒，是不肯原谅。"}, "野人": {"group": "wild", "coords": ["A", "C", "A"], "real": "穆罗／野人", "pos": "辅助·救援", "tags": ["野性", "单纯", "忠诚", "疏离", "自由"], "desc": "与野猪为伴、拒绝人类规则的流浪者", "line": "你只跟会护着你的东西待在一起。"}, "杂技演员": {"group": "show", "coords": ["C", "B", "B"], "real": "麦克·莫顿／杂技演员", "pos": "牵制", "tags": ["欢脱", "表演型", "机敏", "讨好", "悲伤内核"], "desc": "在掌声里藏起悲伤的马戏演员", "line": "你把疼藏在掌声里，观众只听见热闹。"}, "大副": {"group": "guard", "coords": ["D", "C", "A"], "real": "何塞·巴登／大副", "pos": "救援", "tags": ["风流", "义气", "责任感", "逃避", "自我怀疑"], "desc": "背着船长之责、也背着愧疚的航海者", "line": "你把船开回来了，人没全带回来。"}, "调酒师": {"group": "show", "coords": ["C", "C", "D"], "real": "黛米·波本／调酒师", "pos": "辅助·牵制", "tags": ["热烈", "洒脱", "重情", "自毁", "敏锐"], "desc": "用酒精调和伤痛的多夫林酒传人", "line": "你调的酒最烈，是为了让自己先醉。"}, "邮差": {"group": "lone", "coords": ["C", "C", "A"], "real": "维克多·葛兰兹／邮差", "pos": "辅助", "tags": ["温和", "忠诚", "羞怯", "善意", "被动"], "desc": "把话都写进信里、不擅长开口的邮差", "line": "你想说的话，都写在没寄出的那封信里。"}, "守墓人": {"group": "lone", "coords": ["A", "B", "B"], "real": "安德鲁·克雷斯／守墓人", "pos": "救援", "tags": ["自卑", "虔诚", "孤僻", "善良", "执拗"], "desc": "因肤色被排斥、在墓园里找到安宁的人", "line": "你在墓园里才觉得，自己不算多余。"}, "“囚徒”": {"group": "genius", "coords": ["B", "C", "C"], "real": "卢卡·巴尔萨／发明家", "pos": "破译·辅助", "tags": ["天才", "狂傲", "偏执", "求知", "记仇"], "desc": "被冤入狱、仍只想证明自己的天才发明家", "line": "你被关过，所以只信自己算出来的答案。"}, "昆虫学者": {"group": "calc", "coords": ["B", "B", "B"], "real": "梅莉·普林尼／昆虫学者", "pos": "牵制·辅助", "tags": ["理性", "疏离", "观察者", "坚韧", "控制欲"], "desc": "把人类社会当作观察样本的学者", "line": "你观察所有人，因为他们不值得你靠近。"}, "画家": {"group": "genius", "coords": ["A", "A", "A"], "real": "艾格·瓦尔登／画家", "pos": "牵制·辅助", "tags": ["天才", "傲慢", "挑剔", "纯粹", "自我"], "desc": "只肯为“纯粹之美”落笔的天才画家", "line": "你画得那么好，是因为你不肯画得随便。"}, "击球手": {"group": "guard", "coords": ["B", "A", "C"], "real": "甘吉·古普塔／板球手", "pos": "辅助·救援", "tags": ["热血", "正义", "冲动", "义气", "自卑"], "desc": "为被欺压者出头的板球手", "line": "你看不得有人被欺负，哪怕不关你的事。"}, "玩具商": {"group": "lone", "coords": ["C", "B", "D"], "real": "安妮·莱斯特／玩具商", "pos": "牵制·辅助", "tags": ["缺乏安全感", "精明", "控制欲", "创伤", "坚韧"], "desc": "从羞辱与欺骗里学会自保的玩具商人", "line": "你把门锁了三道，还是怕有人进来。"}, "病患": {"group": "lone", "coords": ["C", "D", "D"], "real": "埃米尔／病患", "pos": "牵制·救援", "tags": ["温顺", "依赖", "敏感", "失忆", "隐忍"], "desc": "在创伤里失去记忆、只信一个人的病人", "line": "你只记得一个人的名字，也只信他。"}, "“心理学家”": {"group": "calc", "coords": ["C", "A", "C"], "real": "艾达·梅斯默／心理学家", "pos": "辅助", "tags": ["理性", "掌控欲", "冷静", "执着", "疏离"], "desc": "以理性为武器、以掌控为安全感的研究者", "line": "你能解释所有人的情绪，除了自己的。"}, "小说家": {"group": "fate", "coords": ["C", "D", "D"], "real": "“奥尔菲斯”／小说家", "pos": "牵制·辅助", "tags": ["天才", "自负", "分裂", "好奇", "操控"], "desc": "以他人之苦为素材的悬疑小说家", "line": "你把别人的痛写得好，因为你也痛过。"}, "“小女孩”": {"group": "lone", "coords": ["D", "D", "D"], "real": "“回忆”／实验体", "pos": "辅助", "tags": ["天真", "依恋", "好奇", "脆弱", "灵动"], "desc": "被困在记忆与实验里的孩子", "line": "你一直没长大，因为那天没人来接你。"}, "哭泣小丑": {"group": "show", "coords": ["B", "B", "B"], "real": "裘克／哭泣小丑", "pos": "牵制·辅助", "tags": ["自卑", "痴情", "讨好", "悲伤", "善良"], "desc": "在马戏团里永远被比较的第二小丑", "line": "你逗笑所有人，自己一次都没笑过。"}, "“教授”": {"group": "genius", "coords": ["C", "A", "B"], "real": "卢基诺·迪鲁西／生物学家", "pos": "牵制·辅助", "tags": ["博学", "理性", "自负", "好奇", "克制"], "desc": "把进化论推到极致、又努力克制它的人", "line": "你研究了一切，最后的研究对象是自己。"}, "古董商": {"group": "guard", "coords": ["D", "B", "C"], "real": "戚十一／古董商", "pos": "牵制", "tags": ["侠气", "刚烈", "恩怨分明", "隐忍", "独立"], "desc": "以箫为器、恩怨分明的东方侠女", "line": "你的恩和怨分两本账，从不算在一起。"}, "作曲家": {"group": "genius", "coords": ["A", "B", "C"], "real": "弗雷德里克·克雷伯格／作曲家", "pos": "破译", "tags": ["骄傲", "敏感", "天才", "完美主义", "孤独"], "desc": "被家族与天赋同时折磨的音乐天才", "line": "你追求的那一拍，世上没有第二个人听见。"}, "记者": {"group": "lone", "coords": ["C", "B", "A"], "real": "爱丽丝·德罗斯／记者", "pos": "救援", "tags": ["正义", "执着", "勇敢", "好奇", "创伤"], "desc": "追查庄园真相、也追查自己来历的记者", "line": "你追的真相，最后追到了自己身上。"}, "飞行家": {"group": "fate", "coords": ["C", "C", "C"], "real": "查尔斯·霍尔斯／飞行家", "pos": "牵制·救援", "tags": ["理想主义", "冒险", "热情", "莽撞", "责任感"], "desc": "执着于“让人飞起来”的理想主义者", "line": "你想让人飞起来，是因为你自己一直没落地。"}, "啦啦队员": {"group": "guard", "coords": ["C", "C", "A"], "real": "莉莉·巴利尔／啦啦队员", "pos": "辅助·牵制", "tags": ["元气", "热情", "好胜", "团队型", "敏感"], "desc": "用热情掩盖不安的应援队长", "line": "你替所有人加油，没人替你喊过一句。"}, "木偶师": {"group": "genius", "coords": ["A", "D", "D"], "real": "马蒂亚斯·切尔宁／木偶师", "pos": "牵制·救援", "tags": ["孤僻", "偏执", "手艺人", "渴望被爱", "自我投射"], "desc": "只肯与木偶对话的手艺人", "line": "你跟木偶说话，因为它不会走。"}, "火灾调查员": {"group": "guard", "coords": ["A", "A", "A"], "real": "弗洛里安·布兰德／火灾调查员", "pos": "牵制·辅助", "tags": ["正直", "执着", "冷静", "救赎情结", "创伤"], "desc": "从火场里走出来、执着于真相的调查员", "line": "你从火里出来，就一直想找出点火的那只手。"}, "“法罗女士”": {"group": "calc", "coords": ["A", "C", "D"], "real": "伊芙琳·莫雷／交际花", "pos": "破译", "tags": ["优雅", "狡猾", "自保", "精明", "神秘"], "desc": "以香气与谎言在名利场自保的交际花", "line": "你的香气是盾牌，笑是刀。"}, "“骑士”": {"group": "guard", "coords": ["C", "B", "B"], "real": "理查德·斯特灵／骑士", "pos": "救援", "tags": ["荣誉感", "正直", "固执", "勇武", "天真"], "desc": "把荣誉当作信条、不肯低头的骑士", "line": "你的荣誉没人给你，你就自己守着。"}, "气象学家": {"group": "calc", "coords": ["B", "B", "A"], "real": "温迪·福特／气象学家", "pos": "牵制·辅助", "tags": ["理性", "严谨", "坚韧", "疏离", "求知"], "desc": "被当作灾星的气象研究者", "line": "你算得出风暴，算不出人心。"}, "弓箭手": {"group": "wild", "coords": ["D", "C", "B"], "real": "伯伦希尔·维鲁弗／猎手", "pos": "牵制", "tags": ["冷静", "精准", "独立", "强悍", "复仇"], "desc": "从家族覆灭里活下来的北欧猎手", "line": "你只射一箭，因为第二箭就不算准了。"}, "“逃脱大师”": {"group": "calc", "coords": ["C", "C", "D"], "real": "埃弗隆·怀兹／特技演员", "pos": "辅助·救援", "tags": ["多疑", "表演型", "精明", "自保", "记忆错乱"], "desc": "靠逃脱术成名、又被失忆困住的特技演员", "line": "你逃得出所有盒子，逃不出自己的记性。"}, "幻灯师": {"group": "show", "coords": ["A", "C", "D"], "real": "阿曼达·加蒂斯／幻灯师", "pos": "辅助·牵制", "tags": ["病弱", "想象", "叛逆", "好奇", "独立"], "desc": "被嗜睡症与幻觉缠身、以影像谋生的艺术家", "line": "你把现实投成影子，因为影子更听话。"}, "斗牛士": {"group": "wild", "coords": ["B", "B", "A"], "real": "赫南多·罗梅罗／斗牛士", "pos": "牵制·辅助", "tags": ["勇敢", "好胜", "追荣", "自毁", "表演型"], "desc": "在生死边缘讨要掌声的斗牛士", "line": "你要的不是活下来，是有人为那一下叫好。"}, "默剧艺人": {"group": "show", "coords": ["C", "B", "A"], "real": "克莱奥·德克鲁／默剧艺人", "pos": "牵制·辅助", "tags": ["沉默", "共情", "想象", "温柔", "执拗"], "desc": "不用语言、只用身体表达的默剧演员", "line": "你不说话，是因为说了也没人听。"}, "“神童”": {"group": "show", "coords": ["D", "D", "C"], "real": "阿开／“神童”", "pos": "牵制·辅助", "tags": ["说谎", "多疑", "天才", "表演欲", "孤独"], "desc": "靠谎言与操控活下来的“天才儿童”", "line": "你说过太多谎，自己也分不清哪句是真的。"}, "出版编辑": {"group": "show", "coords": ["A", "D", "D"], "real": "罗伊·卡斐／出版编辑", "pos": "未公开", "tags": ["自负", "狂热", "模仿者", "克制", "执念"], "desc": "把自己活成偶像复制品的出版编辑", "line": "你活成了别人的样子，还管那叫崇拜。"}, "厂长": {"group": "fate", "coords": ["A", "D", "B"], "real": "里奥·贝克／工厂主", "pos": "守椅", "tags": ["执念", "暴怒", "工匠", "守护", "悲剧"], "desc": "失去妻子与女儿、把工厂改造成刑场的父亲", "line": "你把家改成了刑场，因为家里已经没人了。"}, "小丑": {"group": "show", "coords": ["B", "C", "B"], "real": "裘克／小丑", "pos": "追击", "tags": ["自卑", "嫉妒", "疯狂", "表演型", "悲情"], "desc": "在马戏团受尽嘲笑后彻底疯狂的表演者", "line": "你笑得越响，越是在替当年的自己出气。"}, "鹿头": {"group": "wild", "coords": ["C", "C", "A"], "real": "班恩·佩雷兹／猎场巡守", "pos": "追击", "tags": ["沉默", "守护", "仇恨", "野性", "忠诚"], "desc": "被夺走一切的守林人", "line": "你守的那片林子，早就不属于你了。"}, "“杰克”": {"group": "lone", "coords": ["C", "B", "C"], "real": "杰克／艺术家", "pos": "追击", "tags": ["优雅", "病态", "艺术气质", "残忍", "孤独"], "desc": "以艺术之名行凶的雾都绅士", "line": "你把它称作艺术，是因为不敢称它为别的。"}, "蜘蛛": {"group": "lone", "coords": ["D", "A", "D"], "real": "瓦尔莱塔／滑稽戏演员", "pos": "追击", "tags": ["自卑", "渴望被爱", "表演欲", "敏感", "偏执"], "desc": "被当作怪物展览、只想要一个拥抱的演员", "line": "你想要的从来不是掌声，是一次拥抱。"}, "红蝶": {"group": "fate", "coords": ["A", "D", "D"], "real": "美智子／艺伎", "pos": "追击", "tags": ["隐忍", "痴情", "怨恨", "优雅", "执念"], "desc": "被爱人背弃、怨念化蝶的美智子", "line": "你化蝶那天，是想让他回头看一眼。"}, "黄衣之主": {"group": "fate", "coords": ["C", "B", "D"], "real": "哈斯塔／旧日支配者", "pos": "守椅", "tags": ["神性", "冷漠", "傲慢", "支配欲", "超然"], "desc": "来自深渊的旧日支配者", "line": "你从不回答，因为你不需要回答。"}, "宿伞之魂": {"group": "guard", "coords": ["C", "A", "D"], "real": "谢必安／范无咎／阴差", "pos": "控场", "tags": ["忠义", "兄弟情", "阴冷", "执念", "双面"], "desc": "一黑一白、以兄弟之情相连的阴差", "line": "你们一黑一白，谁都不肯先走。"}, "摄影师": {"group": "genius", "coords": ["B", "B", "C"], "real": "约瑟夫／摄影师", "pos": "控场", "tags": ["完美主义", "怀旧", "傲慢", "偏执", "艺术"], "desc": "想把瞬间凝固成永恒的摄影师", "line": "你想留住的那一刻，其实早就过去了。"}, "疯眼": {"group": "calc", "coords": ["D", "D", "C"], "real": "巴尔克／建筑师", "pos": "控场", "tags": ["控制欲", "傲慢", "智慧", "冷酷", "偏执"], "desc": "以建筑与机关掌控一切的建筑师", "line": "你把整座庄园造成棋盘，自己坐在最上面。"}, "梦之女巫": {"group": "fate", "coords": ["D", "B", "D"], "real": "伊德海拉／外神", "pos": "控场", "tags": ["神性", "玩弄人心", "母性", "冷漠", "古老"], "desc": "以梦境与信徒为玩物的外神", "line": "你给的梦太甜，醒来的人都不肯认。"}, "爱哭鬼": {"group": "lone", "coords": ["D", "B", "D"], "real": "罗比·怀特／孤儿", "pos": "追击", "tags": ["天真", "渴望爱", "悲伤", "无邪之恶", "依恋"], "desc": "在孤儿院失去一切、只想有人陪的孩子", "line": "你要的只是有人陪，哪怕一起疼。"}, "孽蜥": {"group": "wild", "coords": ["B", "B", "B"], "real": "卢基诺·迪鲁西／生物学家", "pos": "追击", "tags": ["求知", "自负", "兽性", "实验狂", "理性"], "desc": "把自己当作进化实验品的生物学家", "line": "你把自己当样本，因为没人肯当你的同类。"}, "红夫人": {"group": "fate", "coords": ["D", "C", "B"], "real": "玛丽／法国王后", "pos": "追击", "tags": ["骄矜", "优雅", "虚荣", "怨恨", "权力欲"], "desc": "被送上断头台的法国王后", "line": "你到最后都在维持那副体面。"}, "26号守卫": {"group": "guard", "coords": ["D", "D", "D"], "real": "邦邦／机械守卫", "pos": "守椅", "tags": ["单纯", "忠诚", "机械理性", "好奇", "笨拙"], "desc": "被制造出来守门、只懂得执行命令的机械守卫", "line": "你只懂执行命令，所以从不会背叛。"}, "“使徒”": {"group": "fate", "coords": ["A", "A", "B"], "real": "安／修女", "pos": "守椅", "tags": ["虔诚", "狂热", "怜悯", "冷酷", "救赎感"], "desc": "以惩戒代替救赎的修女", "line": "你把惩戒叫作救赎，是因为你救不了自己。"}, "小提琴家": {"group": "genius", "coords": ["A", "C", "C"], "real": "安东尼奥／小提琴家", "pos": "守椅", "tags": ["天才", "傲慢", "癫狂", "艺术", "自私"], "desc": "与恶魔交易换得琴技的小提琴家", "line": "你的琴声换来了东西，你自己都不敢听。"}, "雕刻家": {"group": "genius", "coords": ["B", "A", "B"], "real": "伽拉泰亚·克劳德／雕刻家", "pos": "守椅", "tags": ["天才", "完美主义", "偏执", "冷酷", "控制"], "desc": "把活人当作石材的天才雕塑家", "line": "你把活人当石材，因为活人会走。"}, "“博士”": {"group": "genius", "coords": ["C", "B", "C"], "real": "珀西／发明家", "pos": "控场", "tags": ["狂热", "理性", "自负", "残忍", "求知"], "desc": "以“完美造物”为目标的疯狂发明家", "line": "你想造出完美的东西，因为你自己不完美。"}, "破轮": {"group": "show", "coords": ["D", "C", "D"], "real": "威尔三兄弟／剧团团员", "pos": "控场", "tags": ["欺骗", "表演型", "团体人格", "阴险", "悲情"], "desc": "三人共用一具身体的剧团演员", "line": "你们三个共用一张脸，谁都不算完整。"}, "渔女": {"group": "wild", "coords": ["C", "A", "D"], "real": "格蕾丝／渔村“神女”", "pos": "守椅", "tags": ["天真", "怨恨", "孤独", "被神化", "渴望爱"], "desc": "被渔村奉为神女、又被投入海中的女孩", "line": "他们叫你神女，然后把你扔进了海里。"}, "蜡像师": {"group": "fate", "coords": ["A", "B", "D"], "real": "菲利普／蜡像师", "pos": "追击", "tags": ["偏执", "温柔", "恋物", "病态", "执念"], "desc": "用蜡留住逝者、不肯让任何人离开的蜡像师", "line": "你把离开的人做成蜡像，就当作他们没走。"}, "“噩梦”": {"group": "genius", "coords": ["D", "C", "D"], "real": "“奥尔菲斯”／小说家", "pos": "控场", "tags": ["分裂", "操控", "傲慢", "恐惧", "天才"], "desc": "小说家的另一重人格", "line": "你是他自己不肯承认的那一半。"}, "“记录员”": {"group": "genius", "coords": ["D", "A", "C"], "real": "柯根·尼古拉斯·基奥／裁决者", "pos": "控场", "tags": ["冷静", "权力欲", "审判者", "算计", "傲慢"], "desc": "以档案与判词审判他人的裁决者", "line": "你判所有人有罪，是因为先判了自己。"}, "隐士": {"group": "calc", "coords": ["A", "B", "B"], "real": "阿尔瓦·洛伦兹／电磁学研究者", "pos": "控场", "tags": ["理性", "执念", "克制", "傲慢", "孤独"], "desc": "把一生押在一条电磁公式上的研究者", "line": "你把一生押在一个公式上，公式没错，人错了。"}, "守夜人": {"group": "wild", "coords": ["C", "C", "D"], "real": "伊塔库亚／守夜人", "pos": "追击", "tags": ["孤独", "守护", "野性", "天真", "戒备"], "desc": "在风雪里守着某个约定的猎人", "line": "你在雪里守着，其实没有人会来。"}, "歌剧演员": {"group": "show", "coords": ["A", "C", "C"], "real": "桑格莉娅／歌剧演员", "pos": "追击", "tags": ["野心", "表演欲", "优雅", "危险", "自我"], "desc": "把舞台上的杀戮当成演出的女演员", "line": "你把杀戮演成谢幕，台下还有人鼓掌。"}, "“愚人金”": {"group": "calc", "coords": ["C", "D", "C"], "real": "诺顿·坎贝尔／矿工", "pos": "守椅", "tags": ["贪婪", "记仇", "自卑", "精明", "偏执"], "desc": "被财富与怨恨重塑的矿工", "line": "你恨的不是穷，是当年看不起你的那些人。"}, "时空之影": {"group": "lone", "coords": ["C", "D", "C"], "real": "“艾维”／灵魂学家", "pos": "控场", "tags": ["神秘", "冷静", "学者", "操控", "疏离"], "desc": "研究灵魂与时间边界的神秘学者", "line": "你在时间的缝里找一个人，找了很久。"}, "“跛脚羊”": {"group": "wild", "coords": ["C", "D", "A"], "real": "杰弗里·博纳维塔／饲养员", "pos": "追击", "tags": ["占有欲", "偏执", "野性", "孤独", "饲养者"], "desc": "用牢笼把“家人”留在身边的饲养员", "line": "你把牢笼叫作家，因为里面有你想要的东西。"}, "“喧嚣”": {"group": "show", "coords": ["A", "C", "B"], "real": "麦克·莫顿／杂技演员", "pos": "追击", "tags": ["疯狂", "表演型", "嫉妒", "失控", "悲情"], "desc": "被嫉妒烧尽的杂技演员", "line": "你把嫉妒烧成了一场演出，谁都没跑掉。"}, "杂货商": {"group": "fate", "coords": ["D", "C", "C"], "real": "瓦伦蒂娜·雅加·瓦西里耶娃／杂货商", "pos": "追击", "tags": ["精明", "欺骗", "母性", "狠厉", "怀旧"], "desc": "用一杆秤称量人心、也撑起一个家的杂货商", "line": "你那杆秤称得出斤两，称不出自己的价。"}, "“台球手”": {"group": "calc", "coords": ["D", "D", "A"], "real": "马库斯·索恩／台球手", "pos": "控场", "tags": ["冷静", "算计", "精准", "高傲", "控制欲"], "desc": "把追逃变成一局封闭赌局的台球手", "line": "你把每一局都算死了，除了自己那一杆。"}, "“女王蜂”": {"group": "calc", "coords": ["C", "C", "C"], "real": "梅莉·普林尼／昆虫学者", "pos": "追击", "tags": ["支配欲", "冷酷", "理性", "群体意识", "威严"], "desc": "以虫群统治一切、不再与人类共生的“女王”", "line": "你不再需要人，因为虫群不会背叛。"}, "“牙医”": {"group": "genius", "coords": ["C", "D", "D"], "real": "芬森·亨特／牙医", "pos": "追击", "tags": ["冷静", "实验狂", "控制", "偏执", "疏离"], "desc": "在沼泽诊所里以紫外线“治疗”他人的牙医", "line": "你说你在治他们，其实是他们在治你。"}, "“心兽”": {"group": "wild", "coords": ["B", "D", "B"], "real": "埃米尔／病患", "pos": "追击", "tags": ["本能驱动", "无惧", "兽性", "精神空洞", "温顺残影"], "desc": "被剥离恐惧、只剩本能的病患", "line": "你把恐惧剥掉了，剩下的是谁在替它走。"}}, "meta": {"guard": {"tagline": "先救人，再谈别的", "body": "在一局对局里，你的注意力总是先落在人身上：谁倒了、谁快没血、谁刚被骂了一句。你把“答应过的事”和“人在场”当作必须兑现的东西，哪怕代价是自己被放上椅子。你对“这总得有人管”特别敏感，也很难假装没看见。", "traits": ["出事时第一反应是顶上，而不是先算得失", "记人情，也记别人对你的辜负", "习惯用行动表达在乎，不太会说场面话"], "tip": "你容易把别人的责任也一起背走。把自己撑不住的那一刻也算进“该被照顾的人”里，会轻很多。"}, "calc": {"tagline": "先算清楚，再动手", "body": "你习惯把混乱先变成一张能读的表：谁在哪、还剩几台、下一步走哪。信息、顺序、位置是你的安全感来源。你不喜欢靠运气赢，也不喜欢把局面交到别人手上，宁可自己多担一点。", "traits": ["事前先列条件，事后一定复盘", "对“失控”的容忍度很低", "讲效率，也讲投入产出"], "tip": "算得越准，越容易低估人的不可控。给“没按计划来”的那部分留点余量，计划才不会一次崩完。"}, "genius": {"tagline": "只做到自己认的那一步", "body": "你有一件非要做到位的事，标准由自己定，别人认不认是另一回事。你能一个人钻进去很久，也能为一个别人看不出的小瑕疵重做十遍。这份较真让你真做出东西，也让你不太容易放过自己。", "traits": ["对细节的标准高于对结果的期待", "被否定时先不服，再回头自己较劲", "能独处很久，且不觉得孤独是问题"], "tip": "完美主义最容易变成拖延的借口。给“够用”划一条线，产出才追得上标准。"}, "show": {"tagline": "先让人看见，再谈别的", "body": "你熟悉场面的节奏：什么时候该热场，什么时候该退半步，什么时候一句话就能把气氛翻过来。你不太愿意把真实的疲惫摆上台面，更愿意把它包成一个段子。被看见对你是燃料，冷场是你的噩梦。", "traits": ["擅长读场，情绪切换很快", "用玩笑处理难受的事", "在意别人的反应，也在意自己给出的形象"], "tip": "长期只演不歇，会分不清哪一版是自己。留几个不需要表演的对象。"}, "lone": {"tagline": "一个人的时候最像自己", "body": "你对距离很敏感，靠近之前先判断对方会不会越界。你不需要热闹来证明什么，也不喜欢被安排。独处对你不是退，而是恢复。你对少数几个人有很深的忠诚，但那扇门开得很慢。", "traits": ["边界清楚，不喜欢被打扰", "观察多于参与，心里有一本账", "一旦认下谁，就很难换"], "tip": "“我一个人也行”说得太多次，会让想靠近的人不敢开口。偶尔主动一次就够了。"}, "wild": {"tagline": "身体先动，脑子后到", "body": "你相信第一下反应：危险来了是先跑、先扑，还是先伏低，你比谁都清楚。规则、场面话、客套对你来说都是多余的步骤。你要的是自由和边界，最受不了被圈住。", "traits": ["凭直觉行动，事后才复盘", "不怕硬碰，怕被管", "情绪来得直接，也散得快"], "tip": "本能很强、收尾偏弱。给自己留一个“先停三秒”的习惯，别人会更容易跟上你。"}, "fate": {"tagline": "有件事一直没放下", "body": "你心里有一件没做完、没等到、没弄明白的事，它影响了你很多选择。你能为它等很久，也能为它付出别人觉得不值的代价。别人劝你算了，你听进去了，但没有照做。", "traits": ["对“未完成”特别敏感", "能长期等一个不确定的结果", "愿意为在意的事付出超额代价"], "tip": "执念本身不是毛病，代价才要提前算。给自己设一个止损点，比硬撑更难得。"}}, "dim": {"guard": "义气", "calc": "谋算", "genius": "偏执", "show": "表演", "lone": "自守", "wild": "野性", "fate": "执念"}};
+const state = { view:'start', gAns:[], bAns:[], group:null };
+const LETTERS = ['A','B','C','D'];
+const app = document.getElementById('app');
+
+function render(){
+  if(state.view==='start') renderStart();
+  else if(state.view==='general') renderGeneral();
+  else if(state.view==='branch') renderBranch();
+  else renderResult();
+}
+
+function renderStart(){
+  app.innerHTML = `
+  <div class="title-block">
+    <h1>你是第五人格<br>庄园里的谁？</h1>
+    <div class="sub">12 道情境题先定你的性格族群，<br>再用 3 道题找出最像你的那位角色。<br>结果含性格光谱雷达图、匹配度与逐题解析。<br>全程约 3 分钟，凭第一反应作答即可。</div>
+  </div>
+  <div class="card" style="margin-top:26px;">
+    <div class="qtext center">测一测，庄园里哪个人替你活过一遍</div>
+    <button class="btn" onclick="startTest()">开始测试</button>
+    <div class="disc">本测试为粉丝自制趣味内容，非官方测试，与网易及《第五人格》官方无关，不构成心理测评。</div>
+  </div>`;
+}
+
+function startTest(){ state.gAns=[]; state.bAns=[]; state.group=null; state.view='general'; render(); }
+
+function renderGeneral(){
+  const i = state.gAns.length;
+  if(i>=DATA.general.length){ finishGeneral(); return; }
+  const q = DATA.general[i];
+  const pct = Math.round(i/DATA.general.length*100);
+  app.innerHTML = `
+  <div class="card">
+    <div class="progress"><i style="width:${pct}%"></i></div>
+    <div class="qno">第 ${i+1} / ${DATA.general.length} 题</div>
+    <div class="qtext">${q.q}</div>
+    ${q.options.map((o,idx)=>`
+      <button class="opt" onclick="pickGeneral(${idx})">
+        <span class="mark">${LETTERS[idx]}</span>${o.t}
+      </button>`).join('')}
+  </div>`;
+}
+
+function pickGeneral(idx){ state.gAns.push(idx); render(); }
+
+const KEYS = ['guard','calc','genius','show','lone','wild','fate'];
+
+function finishGeneral(){
+  const score = {guard:0,calc:0,genius:0,show:0,lone:0,wild:0,fate:0};
+  DATA.general.forEach((q,i)=>{
+    const w = q.options[state.gAns[i]].w;
+    for(const k in w) score[k]=(score[k]||0)+w[k];
+  });
+  state.score = score;
+  let best = KEYS[0];
+  KEYS.forEach(k=>{ if(score[k]>score[best]) best=k; });
+  state.group = best;
+  state.view='branch';
+  render();
+}
+
+function renderBranch(){
+  const qs = DATA.branch[state.group];
+  const i = state.bAns.length;
+  if(i>=qs.length){ finishBranch(); return; }
+  const q = qs[i];
+  const pct = Math.round(i/qs.length*100);
+  app.innerHTML = `
+  <div class="card">
+    <div class="progress"><i style="width:${pct}%"></i></div>
+    <div class="qno">深入了解 · 第 ${i+1} / ${qs.length} 题</div>
+    <div class="qtext">${q.q}</div>
+    ${q.options.map((o,idx)=>`
+      <button class="opt" onclick="pickBranch(${idx})">
+        <span class="mark">${LETTERS[idx]}</span>${o}
+      </button>`).join('')}
+  </div>`;
+}
+
+function pickBranch(idx){ state.bAns.push(LETTERS[idx]); render(); }
+
+function finishBranch(){
+  const res = [];
+  for(const name in DATA.chars){
+    const c = DATA.chars[name];
+    if(c.group!==state.group) continue;
+    let sc=0;
+    c.coords.forEach((co,j)=>{ if(state.bAns[j]===co) sc++; });
+    res.push({name, sc, c});
+  }
+  res.sort((a,b)=>b.sc-a.sc || (a.name>b.name?1:-1));
+  const top = res[0].sc;
+  const winners = res.filter(r=>r.sc===top).slice(0,2);
+  state.winners = winners;
+  state.cands = res.slice(0,3);
+  state.hits = top;
+  state.view='result';
+  render();
+}
+
+function radarSVG(score){
+  const n = KEYS.length, R = 74, CX = 148, CY = 100;
+  const maxv = Math.max.apply(null, KEYS.map(k=>score[k]||0)) || 1;
+  const pt = (i,r)=>{ const a = -Math.PI/2 + i*2*Math.PI/n; return [CX+Math.cos(a)*r, CY+Math.sin(a)*r]; };
+  let ring = '';
+  [0.25,0.5,0.75,1].forEach(f=>{
+    const p = KEYS.map((k,i)=>pt(i,R*f).map(x=>x.toFixed(1)).join(',')).join(' ');
+    ring += `<polygon points="${p}" fill="none" stroke="#ded0b2" stroke-width="1"/>`;
+  });
+  let axes = '';
+  KEYS.forEach((k,i)=>{ const [x,y]=pt(i,R); axes += `<line x1="${CX}" y1="${CY}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="#ded0b2"/>`; });
+  const pts = KEYS.map((k,i)=>{
+    const v = Math.max(((score[k]||0)/maxv)*0.92, 0.1);
+    return pt(i,R*v).map(x=>x.toFixed(1)).join(',');
+  }).join(' ');
+  let labels = '';
+  KEYS.forEach((k,i)=>{
+    const [x,y] = pt(i,R+15);
+    const anchor = Math.abs(x-CX)<6 ? 'middle' : (x>CX ? 'start':'end');
+    const dy = y < CY ? -2 : 9;
+    const hi = score[k]===maxv && maxv>0;
+    labels += `<text x="${x.toFixed(1)}" y="${(y+dy).toFixed(1)}" text-anchor="${anchor}" font-size="10.5" fill="${hi?'#3f4a54':'#8a7f66'}" font-weight="${hi?'700':'400'}">${DATA.dim[k]}</text>`;
+  });
+  return `<svg viewBox="0 -8 296 216" width="296" height="216" aria-label="性格光谱雷达图">
+    ${ring}${axes}
+    <polygon points="${pts}" fill="rgba(63,74,84,.22)" stroke="#3f4a54" stroke-width="2" stroke-linejoin="round"/>
+    ${KEYS.map((k,i)=>{ const v=Math.max(((score[k]||0)/maxv)*0.92,0.1); const [x,y]=pt(i,R*v);
+        return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" fill="#3f4a54"/>`; }).join('')}
+    ${labels}
+  </svg>`;
+}
+
+function renderResult(){
+  const [main, second] = state.winners;
+  const m = main.c;
+  const meta = DATA.meta[state.group];
+  const score = state.score;
+  const maxv = Math.max.apply(null, KEYS.map(k=>score[k]||0)) || 1;
+  const total = KEYS.reduce((s,k)=>s+(score[k]||0),0) || 1;
+  const hitPct = Math.round(state.hits/3*100);
+  const used = [main.name, second && second.name];
+  const sibs = Object.entries(DATA.chars)
+    .filter(([n,c])=>c.group===state.group && used.indexOf(n)<0)
+    .slice(0,4).map(x=>x[0]);
+
+  const bars = KEYS.map(k=>{
+    const v = score[k]||0;
+    const w = Math.max(Math.round(v/maxv*100), 4);
+    return `<div class="bar-row ${v===maxv?'on':''}">
+      <div class="bar-top"><span>${DATA.dim[k]}</span><span>${v} 分 · 占 ${Math.round(v/total*100)}%</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${w}%"></div></div>
+    </div>`;
+  }).join('');
+
+  const cands = state.cands.map((r,i)=>{
+    const t = r.c.tags.slice(0,2).join('、');
+    return `<tr><td class="rk">${i+1}</td><td><b>${r.name}</b><br><span style="color:#8a7f66">${t}</span></td>
+      <td class="pt">${Math.round(r.sc/3*100)}%</td></tr>`;
+  }).join('');
+
+  const rows = DATA.general.map((q,i)=>{
+    const o = q.options[state.gAns[i]];
+    const k = Object.keys(o.w).sort((a,b)=>o.w[b]-o.w[a]).map(x=>DATA.dim[x]).join('/');
+    return `<tr><td class="rk">${i+1}</td><td>${o.t}</td><td class="pt">${k}</td></tr>`;
+  }).join('');
+  const brows = DATA.branch[state.group].map((q,i)=>{
+    return `<tr><td class="rk">深${i+1}</td><td>${q.options[LETTERS.indexOf(state.bAns[i])]}</td><td class="pt">细选</td></tr>`;
+  }).join('');
+
+  app.innerHTML = `
+  <div class="title-block">
+    <h1>你在庄园里是</h1>
+  </div>
+  <div class="mcard" style="margin-top:14px;">
+    <div class="result-group">${DATA.groups[state.group]} · ${meta.tagline}</div>
+    <div class="result-name">${main.name}</div>
+    ${m.line?`<div class="result-line">「${m.line}」</div>`:''}
+    <div class="center" style="margin-top:12px;">${m.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+    <div class="result-desc">${m.desc}</div>
+    <div class="kv" style="margin-top:6px;border-top:1px dashed #e0d3b6;padding-top:10px;"><span>档案身份</span><b>${m.real}</b></div>
+    <div class="kv"><span>场上定位</span><b>${m.pos}</b></div>
+    <div class="kv"><span>三题命中</span><b>${state.hits} / 3 · 匹配度 ${hitPct}%</b></div>
+  </div>
+
+  <div class="sec-h">你的性格光谱</div>
+  <div class="mcard">
+    ${radarSVG(score)}
+    <div class="small" style="text-align:center;margin-top:2px;">七维相对强弱：越靠外的顶点，是你在 12 道题里越明显的倾向</div>
+    <div class="bars" style="margin-top:14px;">${bars}</div>
+    <div class="small">12 道题共打出 ${total} 分的权重，占比越高，代表你在这种处事方式上越稳定。</div>
+  </div>
+
+  <div class="sec-h">同为这一族的其他角色</div>
+  <div class="mcard">
+    <div class="match">
+      <div class="dots">${[0,1,2].map(i=>`<span class="dot ${i<state.hits?'on':''}"></span>`).join('')}</div>
+      <div class="match-num">${hitPct}<em>% 匹配</em></div>
+    </div>
+    <table style="margin-top:12px;">
+      <tr><th style="width:30px;">#</th><th>角色</th><th style="text-align:right;">匹配度</th></tr>
+      ${cands}
+    </table>
+    <div class="small">匹配度＝你在三题分支题上与这位角色落点重合的比例。同分时按角色顺序给出主结果与备选，不做随机抽取。</div>
+  </div>
+
+  <div class="sec-h">为什么是 TA</div>
+  <div class="mcard">
+    <div class="ana-h">${DATA.groups[state.group]}｜${meta.tagline}</div>
+    <div class="ana-tag">${state.group==='guard'?'先看人，再看局':''}${state.group==='calc'?'先把局面读成一张表':''}${state.group==='genius'?'标准自己定':''}${state.group==='show'?'先立住场面':''}${state.group==='lone'?'先看边界':''}${state.group==='wild'?'先信身体':''}${state.group==='fate'?'先认那件没放下的事':''}</div>
+    <div class="ana-p">${meta.body}</div>
+    <div class="ana-h" style="margin-top:16px;">你身上的三面</div>
+    ${meta.traits.map(t=>`<div class="ana-li">${t}</div>`).join('')}
+    <div class="ana-tip">${meta.tip}</div>
+  </div>
+
+  <div class="sec-h">你和 ${main.name} 的重合处</div>
+  <div class="mcard">
+    <div class="ana-p">${m.desc}。你的三题选择里有 ${state.hits} 处落在 TA 的同一坐标上，说明你们在关键分歧点的取舍是同一套：遇到事先动哪一步、把什么放在代价前面，都一样。</div>
+    ${m.tags.slice(0,3).length?`<div class="ana-li">TA 身上最像你的标签：${m.tags.slice(0,3).join('、')}</div>`:''}
+    ${second?`<div class="ana-li">若你觉得不够贴，最接近的备选是 ${second.name}。</div>`:''}
+    <button class="btn ghost" onclick="toggleReplay()" style="margin-top:14px;">查看我的 15 个选择</button>
+    <div id="replay" style="display:none;margin-top:12px;">
+      <table>
+        <tr><th style="width:30px;">题</th><th>你选的</th><th style="text-align:right;">指向</th></tr>
+        ${rows}${brows}
+      </table>
+    </div>
+  </div>
+
+  <div class="sec-h">这一族还有谁</div>
+  <div class="mcard">
+    <div class="ana-p">${sibs.length?sibs.join('、')+'——同属「'+DATA.groups[state.group]+'」，但各自站在不同的那一侧。':''}</div>
+    <button class="btn" onclick="location.reload()" style="margin-top:16px;">再测一次</button>
+    <div class="disc">本测试为粉丝自制趣味内容，非官方测试，与网易及《第五人格》官方无关，不构成心理测评。结果仅代表本题库的趣味设定，不等同于任何人格测评工具。</div>
+  </div>`;
+}
+
+function toggleReplay(){
+  const el = document.getElementById('replay');
+  el.style.display = el.style.display==='none' ? 'block' : 'none';
+}
+
+render();
+</script>
+</body>
+</html>
